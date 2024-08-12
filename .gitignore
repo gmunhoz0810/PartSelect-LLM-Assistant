@@ -1,0 +1,8 @@
+node_modules
+backend/conversations.db
+venv/
+.env/
+new_env/
+backend/new_env/
+/build
+*.map

@@ -1,0 +1,5 @@
+fastapi
+pydantic
+openai
+requests
+beautifulsoup4
