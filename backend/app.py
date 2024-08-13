@@ -128,6 +128,9 @@ Match the user's description to the closest symptom from this list.
     def is_conversation_limit_reached(self):
         return self.user_message_count >= MAX_USER_MESSAGES
 
+    def reset(self):
+        self.__init__()
+
 conversation = Conversation()
 
 def get_part_or_model_info(*query_items):
@@ -332,7 +335,6 @@ def search_part(part_url: str):
     except Exception as e:
         print(f"Unexpected error: {e}")
         return {"error": f"An unexpected error occurred: {str(e)}"}
-
 
 def check_compatibility(model_number: str, part_number: str):
     print(f"Checking compatibility between model {model_number} and part {part_number}")
@@ -721,11 +723,10 @@ async def process_query(query: Query):
         conversation.add_message("assistant", error_message)
         return {"response": error_message, "conversation_ended": False}
     
-
 @app.post("/reset")
 async def reset_conversation():
     global conversation
-    conversation = Conversation()
+    conversation.reset()
     return {"message": "Conversation reset successfully"}
 
 if __name__ == "__main__":

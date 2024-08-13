@@ -4,21 +4,7 @@ import { getAIMessage, resetConversation } from "../api/api";
 import { marked } from "marked";
 
 function ChatWindow() {
-  const [messages, setMessages] = useState([{
-    role: "assistant",
-    content: `
-Hi there! 👋 
-
-I'm PartSelect's specialized AI assistant, here to help you with:
-- **Parts**
-- **Models**
-- **Compatibility**
-- **Installation instructions**
-- **Anything else related to PartSelect**
-
-How can I assist you today? Just let me know what you need help with!
-    `
-  }]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loadingState, setLoadingState] = useState("");
@@ -32,6 +18,10 @@ How can I assist you today? Just let me know what you need help with!
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    handleResetConversation();
+  }, []);
 
   const handleSend = async () => {
     if (input.trim() !== "") {
@@ -54,8 +44,7 @@ How can I assist you today? Just let me know what you need help with!
 
           if (response.conversation_ended) {
             alert("This conversation is getting too long. Let's start a new one!");
-            await resetConversation();
-            setMessages([{ role: "assistant", content: "Hi, how can I help you today?" }]);
+            await handleResetConversation();
           }
         } else {
           throw new Error("Invalid response from server");
@@ -70,6 +59,33 @@ How can I assist you today? Just let me know what you need help with!
         setIsLoading(false);
         setLoadingState("");
       }
+    }
+  };
+
+  const handleResetConversation = async () => {
+    try {
+      const resetSuccessful = await resetConversation();
+      if (resetSuccessful) {
+        setMessages([{
+          role: "assistant",
+          content: `
+  Hi there! 👋 
+  
+  I'm PartSelect's specialized AI assistant, here to help you with:
+  - **Parts**
+  - **Models**
+  - **Compatibility**
+  - **Installation instructions**
+  - **Anything else related to PartSelect**
+  
+  How can I assist you today? Just let me know what you need help with!
+          `
+        }]);
+      } else {
+        console.warn("Failed to reset conversation. The chat history may not be cleared.");
+      }
+    } catch (error) {
+      console.error('Error resetting conversation:', error);
     }
   };
 
@@ -133,7 +149,6 @@ How can I assist you today? Just let me know what you need help with!
       return "Error parsing message content";
     }
   };
-
 
   const renderModelInfo = (modelInfo) => {
     return (
@@ -203,6 +218,9 @@ How can I assist you today? Just let me know what you need help with!
 
   return (
     <div className="chat-container">
+      <div className="chat-header">
+        <button className="new-chat-button" onClick={handleResetConversation}>New Chat</button>
+      </div>
       <div className="messages-container">
         {messages.map((message, index) => (
           <div key={index} className={`${message.role}-message-container`}>
@@ -260,6 +278,3 @@ How can I assist you today? Just let me know what you need help with!
 }
 
 export default ChatWindow;
-
-
-

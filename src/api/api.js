@@ -19,7 +19,14 @@ export const getAIMessage = async (userQuery) => {
 
 export const resetConversation = async () => {
   try {
-    await axios.post(`${API_URL}/reset`);
+    const response = await axios.post(`${API_URL}/reset`);
+    if (response.data && response.data.message === "Conversation reset successfully") {
+      console.log("Conversation reset successfully");
+      return true;
+    } else {
+      console.warn("Unexpected response from reset endpoint:", response.data);
+      return false;
+    }
   } catch (error) {
     console.error('Error resetting conversation:', error);
     throw error;
