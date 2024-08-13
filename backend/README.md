@@ -1,4 +1,4 @@
-1. Make sure to export your OpenAI in the terminal before usage.
+1. Make sure to export your OpenAI key inside the backend folder in the terminal before usage.
 ex: export OPENAI_API_KEY=your-api-key-here
 
 2. Inside backend, run python app.py
