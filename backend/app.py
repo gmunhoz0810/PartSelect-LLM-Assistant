@@ -440,7 +440,6 @@ def search_model(model_url: str):
         model_name = soup.find('h1', {'class': 'title-main'})
         model_name = model_name.text.strip() if model_name else "Model name not found"
         
-        # Get manual URLs
         manuals = []
         manual_section = soup.find('div', class_='d-flex flex-wrap mt-2 mb-4')
         if manual_section:

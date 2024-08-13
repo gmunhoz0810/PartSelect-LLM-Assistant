@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ChatWindow.css";
-import { getAIMessage, resetConversation } from "../api/api";
+import { getAIMessage } from "../api/api";
 import { marked } from "marked";
 
 function ChatWindow() {
@@ -20,7 +20,21 @@ function ChatWindow() {
   }, [messages]);
 
   useEffect(() => {
-    handleResetConversation();
+    setMessages([{
+      role: "assistant",
+      content: `
+Hi there! 👋 
+
+I'm PartSelect's specialized AI assistant, here to help you with:
+- **Parts**
+- **Models**
+- **Compatibility**
+- **Installation instructions**
+- **Anything else related to PartSelect**
+
+How can I assist you today? Just let me know what you need help with!
+      `
+    }]);
   }, []);
 
   const handleSend = async () => {
@@ -44,7 +58,6 @@ function ChatWindow() {
 
           if (response.conversation_ended) {
             alert("This conversation is getting too long. Let's start a new one!");
-            await handleResetConversation();
           }
         } else {
           throw new Error("Invalid response from server");
@@ -59,33 +72,6 @@ function ChatWindow() {
         setIsLoading(false);
         setLoadingState("");
       }
-    }
-  };
-
-  const handleResetConversation = async () => {
-    try {
-      const resetSuccessful = await resetConversation();
-      if (resetSuccessful) {
-        setMessages([{
-          role: "assistant",
-          content: `
-  Hi there! 👋 
-  
-  I'm PartSelect's specialized AI assistant, here to help you with:
-  - **Parts**
-  - **Models**
-  - **Compatibility**
-  - **Installation instructions**
-  - **Anything else related to PartSelect**
-  
-  How can I assist you today? Just let me know what you need help with!
-          `
-        }]);
-      } else {
-        console.warn("Failed to reset conversation. The chat history may not be cleared.");
-      }
-    } catch (error) {
-      console.error('Error resetting conversation:', error);
     }
   };
 
@@ -217,10 +203,7 @@ function ChatWindow() {
   };
 
   return (
-    <div className="chat-container">
-      <div className="chat-header">
-        <button className="new-chat-button" onClick={handleResetConversation}>New Chat</button>
-      </div>
+    <div className="chat-window">
       <div className="messages-container">
         {messages.map((message, index) => (
           <div key={index} className={`${message.role}-message-container`}>
