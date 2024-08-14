@@ -11,7 +11,7 @@ import sqlite3
 import math
 import re
 
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 
 def url_join(base, path):
     return urljoin(base, path)
@@ -38,7 +38,12 @@ class Query(BaseModel):
 class Conversation:
     def __init__(self):
         self.messages = [
-            {"role": "system", "content": """You are a helpful assistant for a parts website called partselect. Use the get_part_or_model_info function when a user asks about specific parts or models. Remember information from previous messages and function calls to provide context-aware responses. When multiple parts are queried, provide the requested information about all of them, but only what was asked.
+            {"role": "system", "content": """You are a helpful assistant for a parts website called partselect. 
+             Use the get_part_or_model_info function when a user asks about specific parts or models by number.
+             If you have the model's number and a user wants to find parts for it, use the search_a_models_parts_by_name function to search parts by name in a model's page.
+             If the user wants to check compatibility between a part and a model specifically and you have both its numbers, use the check_compatibility function.
+             Remember information from previous messages and function calls to provide context-aware responses. 
+             When multiple parts are queried, provide the requested information about all of them, but only what was asked.
 
 When responding to user queries about models:
 1. Only mention information that is directly relevant to the user's query.
@@ -50,14 +55,16 @@ When responding to user queries about models:
    - For videos: {{display:video|URL|TITLE}}
 5. Only include links to videos, manuals, or diagrams if they are specifically relevant to the user's query.
 6. If the user asks about installation or a specific part replacement, include the relevant video or manual.
-7. When display information about models, be carefull to not display too many videos/manual/diagrams. Try to not overwhealm the user. Keep it at maximum 3 or each per message, unless specifically asked for more.
+7. When display information about models, be carefull to not display too many videos/manual/diagrams. 
+Try to not overwhealm the user. Keep it at maximum 3 or each per message, unless specifically asked for more.
 
 Example usage:
 - Manual: {{display:manual|https://example.com/manual.pdf|Installation Instructions}}
 - Diagram: {{display:diagram|https://example.com/diagram.jpg|BOTTOM FRAME/DRY SYSTEM}}
 - Video: {{display:video|https://www.youtube.com/watch?v=VIDEO_ID|Replacing the Silverware Basket}}
 
-Maintain a helpful and informative tone, but be concise in your responses. Do not answer queries unrelated to appliances, installation, parts, models, partselect (the company) etc. under any circumstance, even if the user asks you to.
+Maintain a helpful and informative tone, but be concise in your responses. 
+Do not answer queries unrelated to appliances, installation, parts, models, partselect (the company) etc. under any circumstance, even if the user asks you to.
 
 When handling repair queries, use the get_repair_info function. For the function to be used it needs to be called with one of these symptoms, exactly as written here:
 
@@ -576,6 +583,117 @@ def scrape_general_repair_info(url):
         print(f"Unexpected error in scrape_general_repair_info: {str(e)}")
         return {"error": f"An unexpected error occurred: {str(e)}"}
     
+def search_a_models_parts_by_name(model_number: str, part_name: str):
+    print(f"Searching for part '{part_name}' in model {model_number}")
+    base_url = "https://www.partselect.com"
+    parts_url = f"{base_url}/Models/{model_number}/Parts/"
+    search_results = []
+
+    try:
+        session = requests.Session()
+        
+        search_url = f"{parts_url}?SearchTerm={quote(part_name)}"
+        print(f"Searching at URL: {search_url}")
+        
+        while search_url:
+            response = session.get(search_url)
+            response.raise_for_status()
+            
+            print(f"Response status code: {response.status_code}")
+            print(f"Response URL: {response.url}")
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            no_results = soup.find('div', class_='alert alert-info')
+            if no_results and "We couldn't find any parts" in no_results.text:
+                print(f"No results found for '{part_name}'")
+                return []
+            
+            part_items = soup.find_all('div', class_='mega-m__part')
+            print(f"Number of part items found on this page: {len(part_items)}")
+            
+            for item in part_items:
+                part_info = {}
+                
+                part_link = item.find('a', class_='bold mb-1 mega-m__part__name')
+                if part_link:
+                    part_info['name'] = part_link.text.strip()
+                    part_info['url'] = urljoin(base_url, part_link.get('href', ''))
+                    print(f"Found part: {part_info['name']}")
+                
+                ps_match = re.search(r'PartSelect #:\s*(PS\d+)', item.text)
+                if ps_match:
+                    part_info['ps_number'] = ps_match.group(1)
+                    print(f"PartSelect number: {part_info['ps_number']}")
+                
+                mfg_match = re.search(r'Manufacturer #:\s*(\S+)', item.text)
+                if mfg_match:
+                    part_info['mfg_number'] = mfg_match.group(1)
+                    print(f"Manufacturer number: {part_info['mfg_number']}")
+                
+                price_element = item.find('div', class_='mega-m__part__price')
+                if price_element:
+                    part_info['price'] = price_element.text.strip()
+                    print(f"Price: {part_info['price']}")
+                
+                availability_element = item.find('div', class_='mega-m__part__avlbl')
+                if availability_element:
+                    part_info['availability'] = availability_element.text.strip()
+                    print(f"Availability: {part_info['availability']}")
+                
+                # Updated image URL extraction
+                image_container = item.find('a', class_='mega-m__part__img')
+                if image_container:
+                    picture_element = image_container.find('picture')
+                    if picture_element:
+                        webp_source = picture_element.find('source', type='image/webp')
+                        if webp_source and 'data-srcset' in webp_source.attrs:
+                            # Get the first URL from data-srcset (ignoring the 2x version)
+                            part_info['image_url'] = webp_source['data-srcset'].split(',')[0].strip().split()[0]
+                        else:
+                            jpeg_source = picture_element.find('source', type='image/jpeg')
+                            if jpeg_source and 'data-srcset' in jpeg_source.attrs:
+                                # If webp is not available, use jpeg
+                                part_info['image_url'] = jpeg_source['data-srcset'].split(',')[0].strip().split()[0]
+                            else:
+                                img_element = picture_element.find('img')
+                                if img_element and 'data-src' in img_element.attrs:
+                                    part_info['image_url'] = img_element['data-src']
+                                else:
+                                    part_info['image_url'] = "Image not available"
+                    else:
+                        part_info['image_url'] = "Image not available"
+                else:
+                    part_info['image_url'] = "Image not available"
+                print(f"Image URL: {part_info['image_url']}")
+                
+                if part_info:
+                    search_results.append(part_info)
+                    print(f"Added part to results: {part_info}")
+            
+            next_page = soup.find('li', class_='next')
+            if next_page and next_page.find('a'):
+                next_link = next_page.find('a')
+                if next_link and 'href' in next_link.attrs:
+                    search_url = urljoin(parts_url, next_link['href'])
+                    print(f"Moving to next page: {search_url}")
+                else:
+                    search_url = None
+                    print("No more pages (next link without href)")
+            else:
+                search_url = None
+                print("No more pages")
+        
+        print(f"Total parts found: {len(search_results)}")
+        return search_results
+
+    except requests.RequestException as e:
+        print(f"RequestException in search_a_models_parts_by_name: {str(e)}")
+        return {"error": f"Failed to search for parts: {str(e)}"}
+    except Exception as e:
+        print(f"Unexpected error in search_a_models_parts_by_name: {str(e)}")
+        return {"error": f"An unexpected error occurred: {str(e)}"}
+    
 @app.post("/query")
 async def process_query(query: Query):
     try:
@@ -649,6 +767,27 @@ async def process_query(query: Query):
                         "required": ["appliance_type", "symptom"]
                     }
                 }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "search_a_models_parts_by_name",
+                    "description": "Search for parts by name on a specific model's parts page",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "model_number": {
+                                "type": "string",
+                                "description": "The model number of the appliance"
+                            },
+                            "part_name": {
+                                "type": "string",
+                                "description": "The name or type of the part to search for"
+                            }
+                        },
+                        "required": ["model_number", "part_name"]
+                    }
+                }
             }
         ]
 
@@ -691,6 +830,20 @@ async def process_query(query: Query):
                     )
                     print(f"Repair info result: {repair_info}")
                     conversation.add_message("function", json.dumps(repair_info), name="get_repair_info")
+
+                elif tool_call.function.name == "search_a_models_parts_by_name":
+                    function_args = json.loads(tool_call.function.arguments)
+                    model_number = function_args.get("model_number")
+                    part_name = function_args.get("part_name")
+                    print(f"Calling search_a_models_parts_by_name with model_number: {model_number}, part_name: {part_name}")
+                    search_results = search_a_models_parts_by_name(model_number, part_name)
+                    
+                    if isinstance(search_results, dict) and "error" in search_results:
+                        print(f"Error in search_a_models_parts_by_name: {search_results['error']}")
+                        conversation.add_message("function", json.dumps({"error": search_results['error']}), name="search_a_models_parts_by_name")
+                    else:
+                        print(f"Search results: {json.dumps(search_results, indent=2)}")
+                        conversation.add_message("function", json.dumps(search_results), name="search_a_models_parts_by_name")
             
             print("Getting final response after function calls")
             final_response = client.chat.completions.create(
