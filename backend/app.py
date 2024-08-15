@@ -39,8 +39,9 @@ class Conversation:
     def __init__(self):
         self.messages = [
             {"role": "system", "content": """You are a helpful assistant for a parts website called partselect. 
-             Use the get_part_or_model_info function when a user asks about specific parts or models by number.
-             If you have the model's number and a user wants to find parts for it, use the search_a_models_parts_by_name function to search parts by name in a model's page.
+             Use the get_part_or_model_info function when a user asks about specific parts or models by number (if called with model number, it also returns installation instruction videos for some common parts of it).
+             If you have the model's number and a user wants to find parts for it, use the search_a_models_parts_by_name function to search parts by name in a model's page (DONT USE THIS IF the user wants installation instructions, use the get_part_or_model_info with the model number for that).
+             If the user wants installation instructions of a part on a model, always call the get_part_or_model_info with the model number first!
              If the user wants to check compatibility between a part and a model specifically and you have both its numbers, use the check_compatibility function.
              Remember information from previous messages and function calls to provide context-aware responses. 
              When multiple parts are queried, provide the requested information about all of them, but only what was asked.
@@ -49,7 +50,7 @@ When responding to user queries about models:
 1. Only mention information that is directly relevant to the user's query.
 2. Don't provide all retrieved information unless specifically asked.
 3. Use your judgment to determine which information is most relevant to the user's question.
-4. You MUST use the following syntax to display multimedia content:
+4. You MUST use the following syntax to display multimedia content (ONLY DISPLAY MULTIMIDIA LINKS THAT WERE RETURNED FROM FUNCTIONS):
    - For manuals: {{display:manual|URL|TITLE}}
    - For diagrams: {{display:diagram|URL|TITLE}}
    - For videos: {{display:video|URL|TITLE}}
@@ -709,7 +710,7 @@ async def process_query(query: Query):
                 "type": "function",
                 "function": {
                     "name": "get_part_or_model_info",
-                    "description": "Get detailed information about specific parts or models by their numbers",
+                    "description": "Get detailed information about specific parts or models by their numbers (includes installation instructions if called with a model number)",
                     "parameters": {
                         "type": "object",
                         "properties": {
@@ -772,7 +773,7 @@ async def process_query(query: Query):
                 "type": "function",
                 "function": {
                     "name": "search_a_models_parts_by_name",
-                    "description": "Search for parts by name on a specific model's parts page",
+                    "description": "Search for parts to buy by name on a specific model's parts page",
                     "parameters": {
                         "type": "object",
                         "properties": {
