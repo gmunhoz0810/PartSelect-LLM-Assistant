@@ -75,6 +75,19 @@ How can I assist you today? Just let me know what you need help with!
     }
   };
 
+  const processResponse = (response) => {
+    console.log("Processing response:", response);
+    const videoRegex = /\[video\]\((.*?)\)/;
+    const match = response.match(videoRegex);
+    let content = response;
+    let videoUrl = null;
+    if (match) {
+      videoUrl = match[1];
+      content = content.replace(match[0], '').trim();
+    }
+    return { content, videoUrl };
+  };
+
   const renderMessageContent = (content) => {
     if (content === undefined || content === null) {
       return "Error: No content available";
