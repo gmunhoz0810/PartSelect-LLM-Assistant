@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://gpt-learns-counting.onrender.com';
+const API_URL = 'https://partselect-llm-assistant.onrender.com';
 
 export const getAIMessage = async (userQuery) => {
   try {
