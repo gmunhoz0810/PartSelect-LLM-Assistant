@@ -93,7 +93,7 @@ How can I assist you today? Just let me know what you need help with!
       return "Error: No content available";
     }
     try {
-      content = content.replace(/{{display:(video|manual|diagram|image)\|(.*?)\|(.*?)}}/g, (match, type, url, title) => {
+      content = content.replace(/{{display:(video|manual|diagram|image)\|(.*?)\}}/g, (match, type, url, title) => {
         switch(type) {
           case 'video':
             return `<div class="embedded-video">
