@@ -1,7 +1,0 @@
-fastapi
-openai
-requests
-beautifulsoup4
-uvicorn==0.30.5
-pydantic==2.8.2
-python-dotenv
