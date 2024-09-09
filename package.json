@@ -2,7 +2,7 @@
   "name": "chrome-side-panel",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://gmunhoz0810.github.io/GPT-Learns-Counting",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.6.2",
     "@testing-library/jest-dom": "^5.17.0",
