@@ -75,25 +75,12 @@ How can I assist you today? Just let me know what you need help with!
     }
   };
 
-  const processResponse = (response) => {
-    console.log("Processing response:", response);
-    const videoRegex = /\[video\]\((.*?)\)/;
-    const match = response.match(videoRegex);
-    let content = response;
-    let videoUrl = null;
-    if (match) {
-      videoUrl = match[1];
-      content = content.replace(match[0], '').trim();
-    }
-    return { content, videoUrl };
-  };
-
   const renderMessageContent = (content) => {
     if (content === undefined || content === null) {
       return "Error: No content available";
     }
     try {
-      content = content.replace(/{{display:(video|manual|diagram|image)\|(.*?)}}/g, (match, type, url, title) => {
+      content = content.replace(/{{display:(video|manual|diagram|image)\|(.*?)(\|(.*?))?}}/g, (match, type, url, _, title) => {
         switch(type) {
           case 'video':
             return `<div class="embedded-video">
@@ -101,7 +88,7 @@ How can I assist you today? Just let me know what you need help with!
                 width="560"
                 height="315"
                 src="${url.replace("watch?v=", "embed/")}"
-                title="${title}"
+                title="${title || 'Video'}"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -110,16 +97,16 @@ How can I assist you today? Just let me know what you need help with!
           case 'manual':
             return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="manual-link">
               <div class="manual-icon">Manual</div>
-              <div class="manual-title">${title}</div>
+              <div class="manual-title">${title || 'Manual'}</div>
             </a>`;
           case 'diagram':
             return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="diagram-link">
               <div class="diagram-icon">Diagram</div>
-              <div class="diagram-title">${title}</div>
+              <div class="diagram-title">${title || 'Diagram'}</div>
             </a>`;
           case 'image':
             return `<div class="part-image">
-              <img src="${url}" alt="${title}" title="${title}" />
+              <img src="${url}" alt="${title || 'Image'}" title="${title || 'Image'}" />
             </div>`;
           default:
             return match;

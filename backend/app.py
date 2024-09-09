@@ -51,18 +51,18 @@ When responding to user queries about models:
 2. Don't provide all retrieved information unless specifically asked.
 3. Use your judgment to determine which information is most relevant to the user's question.
 4. You MUST use the following syntax to display multimedia content (ONLY DISPLAY MULTIMIDIA LINKS THAT WERE RETURNED FROM FUNCTIONS):
-   - For manuals: {{display:manual|URL}}
-   - For diagrams: {{display:diagram|URL}}
-   - For videos: {{display:video|URL}}
+   - For manuals: {{display:manual|URL|TITLE}}
+   - For diagrams: {{display:diagram|URL|TITLE}}
+   - For videos: {{display:video|URL|TITLE}}
 5. Only include links to videos, manuals, or diagrams if they are specifically relevant to the user's query.
 6. If the user asks about installation or a specific part replacement, include the relevant video or manual.
 7. When display information about models, be carefull to not display too many videos/manual/diagrams. 
 Try to not overwhealm the user. Keep it at maximum 3 or each per message, unless specifically asked for more.
 
 Example usage:
-- Manual: {{display:manual|https://example.com/manual.pdf}}
-- Diagram: {{display:diagram|https://example.com/diagram.jpg}}
-- Video: {{display:video|https://www.youtube.com/watch?v=VIDEO_ID}}
+- Manual: {{display:manual|https://example.com/manual.pdf|Installation Instructions}}
+- Diagram: {{display:diagram|https://example.com/diagram.jpg|BOTTOM FRAME/DRY SYSTEM}}
+- Video: {{display:video|https://www.youtube.com/watch?v=VIDEO_ID|Replacing the Silverware Basket}}
 
 Maintain a helpful and informative tone, but be concise in your responses. 
 Do not answer queries unrelated to appliances, installation, parts, models, partselect (the company) etc. under any circumstance, even if the user asks you to.
@@ -884,4 +884,4 @@ async def reset_conversation():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
