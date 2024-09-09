@@ -19,6 +19,78 @@ body {
   flex-direction: column;
 }
 
+/* Add a darker background to the entire page */
+body {
+  background-color: #f0f0f0; /* Light gray background */
+}
+
+/* Center the chat window and make it narrower */
+.chat-window {
+  max-width: 870px; /* Adjust this value to your preference */
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #ffffff; /* White background for the chat window */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for the bubble effect */
+  border-radius: 8px; /* Rounded corners for the bubble effect */
+}
+
+/* Ensure the chat container takes up the full height */
+.chat-container {
+  height: calc(100vh - 100px); /* Adjust if your header height is different and account for padding */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add padding to the sides of the messages for better readability */
+.messages-container {
+  padding: 16px;
+  background-color: #ffffff; /* Ensure messages have a white background */
+}
+
+/* Adjust message widths for better layout in narrow container */
+.user-message-container,
+.assistant-message-container {
+  max-width: 90%;
+}
+
+/* Make sure input area aligns with messages */
+.input-area {
+  padding: 16px;
+  background-color: #ffffff; /* Ensure input area has a white background */
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 800px) {
+  .chat-window {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .chat-window {
+    padding: 5px;
+  }
+  
+  .user-message-container,
+  .assistant-message-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .chat-window {
+    padding: 0 5px;
+  }
+  
+  .user-message-container,
+  .assistant-message-container {
+    max-width: 100%;
+  }
+}
+
 .messages-container {
   flex: 1;
   overflow-y: auto;

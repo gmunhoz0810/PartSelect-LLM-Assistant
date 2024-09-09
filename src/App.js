@@ -18,7 +18,7 @@ function App() {
   return (
     <div className="App">
       <header className="app-header">
-        <span className="title">Instalily Case Study</span>
+        <span className="title">PartSelect GPT Assistant</span>
         <button className="new-chat-button" onClick={handleResetConversation}>
           New Chat
         </button>
