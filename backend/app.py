@@ -575,7 +575,8 @@ def scrape_general_repair_info(url):
         return {
             'video_url': video_url,
             'repair_info': repair_info,
-            'causes': causes
+            'causes': causes,
+            'link_to_repair_webpage': url
         }
     except requests.RequestException as e:
         print(f"RequestException in scrape_general_repair_info: {str(e)}")
