@@ -2,7 +2,7 @@
   "name": "chrome-side-panel",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://gmunhoz0810.github.io/GPT-Learns-Counting",
+  "homepage": "https://gmunhoz0810.github.io/PartSelect-LLM-Assistant",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.6.2",
     "@testing-library/jest-dom": "^5.17.0",
@@ -34,7 +34,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "main -d build"
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -53,5 +53,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
   }
 }
