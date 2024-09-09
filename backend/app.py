@@ -752,7 +752,7 @@ async def process_query(query: Query):
                 "type": "function",
                 "function": {
                     "name": "get_repair_info",
-                    "description": "Get repair information for appliance issues",
+                    "description": "Get repair information for appliance issues. Note: Always display the videos using the special sintaxe.",
                     "parameters": {
                         "type": "object",
                         "properties": {
