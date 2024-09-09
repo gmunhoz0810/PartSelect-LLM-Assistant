@@ -87,26 +87,14 @@ How can I assist you today? Just let me know what you need help with!
     }
     return { content, videoUrl };
   };
-
+  
   const renderMessageContent = (content) => {
     if (content === undefined || content === null) {
       return "Error: No content available";
     }
     try {
-      content = content.replace(/{{display:(video|manual|diagram|image)\|(.*?)(\|(.*?))?}}/g, (match, type, url, _, title) => {
+      content = content.replace(/{{display:(manual|diagram|image)\|(.*?)(\|(.*?))?}}/g, (match, type, url, _, title = "") => {
         switch(type) {
-          case 'video':
-            return `<div class="embedded-video">
-              <iframe
-                width="560"
-                height="315"
-                src="${url.replace("watch?v=", "embed/")}"
-                title="${title || 'Video'}"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>`;
           case 'manual':
             return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="manual-link">
               <div class="manual-icon">Manual</div>
