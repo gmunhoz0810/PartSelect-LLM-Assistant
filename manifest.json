@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Instalily Case Study",
+  "version": "1.0",
+  "description": "AI Assistant",
+  "side_panel": {
+    "default_path": "index.html"
+  },
+  "permissions": ["sidePanel", "tabs", "activeTabs", "scripting"],
+  "host_permissions": ["https://*/*", "http://*/*","http://*/*/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}

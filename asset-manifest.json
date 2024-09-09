@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/GPT-Learns-Counting/static/css/main.ee3354de.css",
+    "main.js": "/GPT-Learns-Counting/static/js/main.9091c0b2.js",
+    "static/js/787.12438761.chunk.js": "/GPT-Learns-Counting/static/js/787.12438761.chunk.js",
+    "index.html": "/GPT-Learns-Counting/index.html",
+    "main.ee3354de.css.map": "/GPT-Learns-Counting/static/css/main.ee3354de.css.map",
+    "main.9091c0b2.js.map": "/GPT-Learns-Counting/static/js/main.9091c0b2.js.map",
+    "787.12438761.chunk.js.map": "/GPT-Learns-Counting/static/js/787.12438761.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ee3354de.css",
+    "static/js/main.9091c0b2.js"
+  ]
+}
